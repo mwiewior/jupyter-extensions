@@ -172,6 +172,10 @@ class BigQueryService:
 
   @property
   def client(self):
+    client=bigquery.Client(client_info=ClientInfo(
+      user_agent='jupyterlab_gcpextension/jupyterlab_bigquery-{}'.format(
+          VERSION)))
+    self._client = client
     return self._client
 
   @classmethod
@@ -182,7 +186,7 @@ class BigQueryService:
 
   def get_dataset_details(self, dataset_id):
     '''Returns basic metadata for a dataset.'''
-    dataset = self._client.get_dataset(dataset_id)
+    dataset = self.client.get_dataset(dataset_id)
     return {
         'details': {
             'id':
@@ -212,7 +216,7 @@ class BigQueryService:
 
   def get_table_details(self, table_id):
     '''Returns basic metadata for a table.'''
-    table = self._client.get_table(table_id)
+    table = self.client.get_table(table_id)
     return {
         'details': {
             'id':
@@ -251,8 +255,8 @@ class BigQueryService:
 
   def get_table_preview(self, table_id):
     '''Returns 100 preview rows for a table, with records flattened unless they are repeated.'''
-    table = self._client.get_table(table_id)
-    rows = self._client.list_rows(table, max_results=100)
+    table = self.client.get_table(table_id)
+    rows = self.client.list_rows(table, max_results=100)
     fields = rows.schema
 
     return {
@@ -262,7 +266,7 @@ class BigQueryService:
 
   def get_view_details(self, view_id):
     '''Returns basic metadata for a view.'''
-    view = self._client.get_table(view_id)
+    view = self.client.get_table(view_id)
 
     return {
         'details': {
@@ -299,7 +303,7 @@ class BigQueryService:
 
   def get_model_details(self, model_id):
     '''Returns basic metadata for a model, as well as an array of training run dates.'''
-    model = self._client.get_model(model_id)
+    model = self.client.get_model(model_id)
 
     return {
         'details': {
@@ -349,7 +353,7 @@ class BigQueryService:
 
   def get_training_run_details(self, model_id, run_index):
     '''Returns basic details on an individual training run for a model.'''
-    model = self._client.get_model(model_id)
+    model = self.client.get_model(model_id)
     options = model.training_runs[run_index].training_options
 
     details = {}
