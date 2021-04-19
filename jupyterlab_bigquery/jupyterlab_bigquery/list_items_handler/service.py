@@ -30,6 +30,10 @@ class BigQueryService:
 
   @property
   def client(self):
+    client=bigquery.Client(client_info=ClientInfo(
+          user_agent='jupyterlab_gcpextension/jupyterlab_bigquery-{}'.format(
+              VERSION)))
+    self._client = client
     return self._client
 
   @classmethod
@@ -39,7 +43,7 @@ class BigQueryService:
     return cls._instance
 
   def list_projects(self):
-    project = self._client.project
+    project = self.client.project
     projects_list = {
         format(project): {
             'id': format(project),
@@ -50,7 +54,7 @@ class BigQueryService:
     return {'projects': projects_list, 'projectIds': project_ids}
 
   def list_datasets(self, project):
-    datasets = list(self._client.list_datasets(project))
+    datasets = list(self.client.list_datasets(project))
 
     datasets_list = {}
     dataset_ids = []
@@ -66,8 +70,8 @@ class BigQueryService:
     return {'datasets': datasets_list, 'datasetIds': dataset_ids}
 
   def list_tables(self, dataset_id):
-    dataset = self._client.get_dataset(dataset_id)
-    tables = list(self._client.list_tables(dataset))
+    dataset = self.client.get_dataset(dataset_id)
+    tables = list(self.client.list_tables(dataset))
 
     tables_list = {}
     table_ids = []
@@ -87,8 +91,8 @@ class BigQueryService:
     return {'tables': tables_list, 'tableIds': table_ids}
 
   def list_models(self, dataset_id):
-    dataset = self._client.get_dataset(dataset_id)
-    models = list(self._client.list_models(dataset))
+    dataset = self.client.get_dataset(dataset_id)
+    models = list(self.client.list_models(dataset))
 
     models_list = {}
     model_ids = []
